@@ -1,0 +1,934 @@
+{
+ "timestamp": "2026-09-28T16:36:55.031691+00:00",
+ "config": {
+  "langs": [
+   "de",
+   "es",
+   "fr",
+   "ru"
+  ],
+  "n_distractors": 5,
+  "max_combos": 64,
+  "max_tokens": 512,
+  "seed": 0,
+  "perturber_seed": 42
+ },
+ "corpora": {
+  "flores_xsim": {
+   "corpus": "flores",
+   "edits": "xsim",
+   "window": 5,
+   "n_sentences": {
+    "de": 2009,
+    "es": 2009,
+    "fr": 2009,
+    "ru": 2009
+   },
+   "perturbable": {
+    "causality": {
+     "de": 2000,
+     "es": 2002,
+     "fr": 1998,
+     "ru": 1975
+    },
+    "entity": {
+     "de": 1337,
+     "es": 1117,
+     "fr": 1035,
+     "ru": 888
+    },
+    "number": {
+     "de": 436,
+     "es": 584,
+     "fr": 609,
+     "ru": 561
+    }
+   },
+   "by_k": {
+    "1": {
+     "n_windows": 558,
+     "n_enough_distractors": 0,
+     "n_read_by_encoders": 0,
+     "n_read_by_cometkiwi": 0,
+     "source_tokens": 29.456989247311828,
+     "target_tokens": 35.60405009651011,
+     "target_tokens_by_lang": {
+      "de": 33.95,
+      "es": 34.680851063829785,
+      "fr": 38.135714285714286,
+      "ru": 35.64963503649635
+     },
+     "n_enough_by_lang": {
+      "de": 0,
+      "es": 0,
+      "fr": 0,
+      "ru": 0
+     }
+    },
+    "2": {
+     "n_windows": 558,
+     "n_enough_distractors": 103,
+     "n_read_by_encoders": 103,
+     "n_read_by_cometkiwi": 103,
+     "source_tokens": 57.17025089605735,
+     "target_tokens": 69.40464450262166,
+     "target_tokens_by_lang": {
+      "de": 66.9,
+      "es": 68.58156028368795,
+      "fr": 73.74285714285715,
+      "ru": 68.39416058394161
+     },
+     "n_enough_by_lang": {
+      "de": 24,
+      "es": 27,
+      "fr": 27,
+      "ru": 25
+     }
+    },
+    "3": {
+     "n_windows": 558,
+     "n_enough_distractors": 251,
+     "n_read_by_encoders": 251,
+     "n_read_by_cometkiwi": 251,
+     "source_tokens": 85.84946236559139,
+     "target_tokens": 104.25054069694347,
+     "target_tokens_by_lang": {
+      "de": 100.63571428571429,
+      "es": 103.12056737588652,
+      "fr": 110.77142857142857,
+      "ru": 102.47445255474453
+     },
+     "n_enough_by_lang": {
+      "de": 70,
+      "es": 66,
+      "fr": 59,
+      "ru": 56
+     }
+    },
+    "4": {
+     "n_windows": 558,
+     "n_enough_distractors": 317,
+     "n_read_by_encoders": 317,
+     "n_read_by_cometkiwi": 317,
+     "source_tokens": 113.91039426523298,
+     "target_tokens": 138.7298757940822,
+     "target_tokens_by_lang": {
+      "de": 133.7357142857143,
+      "es": 137.5177304964539,
+      "fr": 147.25,
+      "ru": 136.4160583941606
+     },
+     "n_enough_by_lang": {
+      "de": 92,
+      "es": 80,
+      "fr": 78,
+      "ru": 67
+     }
+    },
+    "5": {
+     "n_windows": 558,
+     "n_enough_distractors": 355,
+     "n_read_by_encoders": 355,
+     "n_read_by_cometkiwi": 355,
+     "source_tokens": 143.09139784946237,
+     "target_tokens": 173.56906065345845,
+     "target_tokens_by_lang": {
+      "de": 167.57142857142858,
+      "es": 172.33333333333334,
+      "fr": 184.03571428571428,
+      "ru": 170.33576642335765
+     },
+     "n_enough_by_lang": {
+      "de": 106,
+      "es": 91,
+      "fr": 86,
+      "ru": 72
+     }
+    }
+   }
+  },
+  "flores_minor": {
+   "corpus": "flores",
+   "edits": "minor",
+   "window": 5,
+   "n_sentences": {
+    "de": 2009,
+    "es": 2009,
+    "fr": 2009,
+    "ru": 2009
+   },
+   "perturbable": {
+    "antonym": {
+     "de": 543,
+     "es": 535,
+     "fr": 624,
+     "ru": 299
+    },
+    "number_near": {
+     "de": 436,
+     "es": 409,
+     "fr": 437,
+     "ru": 418
+    },
+    "entity_doc": {
+     "de": 760,
+     "es": 613,
+     "fr": 541,
+     "ru": 614
+    },
+    "omission": {
+     "de": 1982,
+     "es": 1980,
+     "fr": 1978,
+     "ru": 1997
+    },
+    "modality": {
+     "de": 344,
+     "es": 198,
+     "fr": 168,
+     "ru": 193
+    }
+   },
+   "by_k": {
+    "1": {
+     "n_windows": 553,
+     "n_enough_distractors": 0,
+     "n_read_by_encoders": 0,
+     "n_read_by_cometkiwi": 0,
+     "source_tokens": 29.35623869801085,
+     "target_tokens": 35.48545511416954,
+     "target_tokens_by_lang": {
+      "de": 33.89855072463768,
+      "es": 34.91304347826087,
+      "fr": 38.10144927536232,
+      "ru": 35.02877697841727
+     },
+     "n_enough_by_lang": {
+      "de": 0,
+      "es": 0,
+      "fr": 0,
+      "ru": 0
+     }
+    },
+    "2": {
+     "n_windows": 553,
+     "n_enough_distractors": 134,
+     "n_read_by_encoders": 134,
+     "n_read_by_cometkiwi": 134,
+     "source_tokens": 57.10307414104882,
+     "target_tokens": 69.29957772912105,
+     "target_tokens_by_lang": {
+      "de": 66.8768115942029,
+      "es": 68.76086956521739,
+      "fr": 73.92753623188406,
+      "ru": 67.63309352517986
+     },
+     "n_enough_by_lang": {
+      "de": 40,
+      "es": 34,
+      "fr": 31,
+      "ru": 29
+     }
+    },
+    "3": {
+     "n_windows": 553,
+     "n_enough_distractors": 260,
+     "n_read_by_encoders": 260,
+     "n_read_by_cometkiwi": 260,
+     "source_tokens": 85.80831826401446,
+     "target_tokens": 104.14789907204671,
+     "target_tokens_by_lang": {
+      "de": 100.68840579710145,
+      "es": 103.34057971014492,
+      "fr": 111.20289855072464,
+      "ru": 101.35971223021583
+     },
+     "n_enough_by_lang": {
+      "de": 79,
+      "es": 61,
+      "fr": 65,
+      "ru": 55
+     }
+    },
+    "4": {
+     "n_windows": 553,
+     "n_enough_distractors": 342,
+     "n_read_by_encoders": 342,
+     "n_read_by_cometkiwi": 342,
+     "source_tokens": 113.92585895117541,
+     "target_tokens": 138.7516682306329,
+     "target_tokens_by_lang": {
+      "de": 134.02173913043478,
+      "es": 137.92028985507247,
+      "fr": 147.9855072463768,
+      "ru": 135.0791366906475
+     },
+     "n_enough_by_lang": {
+      "de": 100,
+      "es": 87,
+      "fr": 88,
+      "ru": 67
+     }
+    },
+    "5": {
+     "n_windows": 553,
+     "n_enough_distractors": 382,
+     "n_read_by_encoders": 382,
+     "n_read_by_cometkiwi": 382,
+     "source_tokens": 143.1121157323689,
+     "target_tokens": 173.58951099989574,
+     "target_tokens_by_lang": {
+      "de": 167.9855072463768,
+      "es": 172.8913043478261,
+      "fr": 184.8913043478261,
+      "ru": 168.58992805755395
+     },
+     "n_enough_by_lang": {
+      "de": 106,
+      "es": 96,
+      "fr": 101,
+      "ru": 79
+     }
+    }
+   }
+  },
+  "ntrex_xsim": {
+   "corpus": "ntrex",
+   "edits": "xsim",
+   "window": 14,
+   "n_sentences": {
+    "de": 1997,
+    "es": 1997,
+    "fr": 1997,
+    "ru": 1997
+   },
+   "perturbable": {
+    "causality": {
+     "de": 1969,
+     "es": 1964,
+     "fr": 1956,
+     "ru": 1941
+    },
+    "entity": {
+     "de": 1508,
+     "es": 1477,
+     "fr": 1556,
+     "ru": 1320
+    },
+    "number": {
+     "de": 481,
+     "es": 677,
+     "fr": 725,
+     "ru": 628
+    }
+   },
+   "by_k": {
+    "1": {
+     "n_windows": 308,
+     "n_enough_distractors": 0,
+     "n_read_by_encoders": 0,
+     "n_read_by_cometkiwi": 0,
+     "source_tokens": 16.321428571428573,
+     "target_tokens": 21.768449202738502,
+     "target_tokens_by_lang": {
+      "de": 20.810126582278482,
+      "es": 20.597560975609756,
+      "fr": 23.115384615384617,
+      "ru": 22.55072463768116
+     },
+     "n_enough_by_lang": {
+      "de": 0,
+      "es": 0,
+      "fr": 0,
+      "ru": 0
+     }
+    },
+    "2": {
+     "n_windows": 308,
+     "n_enough_distractors": 113,
+     "n_read_by_encoders": 113,
+     "n_read_by_cometkiwi": 113,
+     "source_tokens": 51.55194805194805,
+     "target_tokens": 65.1990972446662,
+     "target_tokens_by_lang": {
+      "de": 62.51898734177215,
+      "es": 61.63414634146341,
+      "fr": 69.17948717948718,
+      "ru": 67.46376811594203
+     },
+     "n_enough_by_lang": {
+      "de": 25,
+      "es": 30,
+      "fr": 33,
+      "ru": 25
+     }
+    },
+    "3": {
+     "n_windows": 308,
+     "n_enough_distractors": 247,
+     "n_read_by_encoders": 247,
+     "n_read_by_cometkiwi": 247,
+     "source_tokens": 87.1038961038961,
+     "target_tokens": 107.55836308844651,
+     "target_tokens_by_lang": {
+      "de": 103.67088607594937,
+      "es": 102.47560975609755,
+      "fr": 114.0,
+      "ru": 110.08695652173913
+     },
+     "n_enough_by_lang": {
+      "de": 66,
+      "es": 63,
+      "fr": 63,
+      "ru": 55
+     }
+    },
+    "4": {
+     "n_windows": 308,
+     "n_enough_distractors": 283,
+     "n_read_by_encoders": 283,
+     "n_read_by_cometkiwi": 283,
+     "source_tokens": 118.51623376623377,
+     "target_tokens": 145.05121786008937,
+     "target_tokens_by_lang": {
+      "de": 139.8227848101266,
+      "es": 137.85365853658536,
+      "fr": 153.6153846153846,
+      "ru": 148.91304347826087
+     },
+     "n_enough_by_lang": {
+      "de": 74,
+      "es": 75,
+      "fr": 71,
+      "ru": 63
+     }
+    },
+    "5": {
+     "n_windows": 308,
+     "n_enough_distractors": 294,
+     "n_read_by_encoders": 294,
+     "n_read_by_cometkiwi": 286,
+     "source_tokens": 149.0194805194805,
+     "target_tokens": 181.90355690626674,
+     "target_tokens_by_lang": {
+      "de": 175.37974683544303,
+      "es": 172.6341463414634,
+      "fr": 193.39743589743588,
+      "ru": 186.20289855072463
+     },
+     "n_enough_by_lang": {
+      "de": 75,
+      "es": 78,
+      "fr": 77,
+      "ru": 64
+     }
+    },
+    "6": {
+     "n_windows": 308,
+     "n_enough_distractors": 301,
+     "n_read_by_encoders": 301,
+     "n_read_by_cometkiwi": 258,
+     "source_tokens": 179.11363636363637,
+     "target_tokens": 218.16331259080127,
+     "target_tokens_by_lang": {
+      "de": 210.83544303797467,
+      "es": 206.58536585365854,
+      "fr": 232.8846153846154,
+      "ru": 222.34782608695653
+     },
+     "n_enough_by_lang": {
+      "de": 76,
+      "es": 81,
+      "fr": 78,
+      "ru": 66
+     }
+    },
+    "7": {
+     "n_windows": 308,
+     "n_enough_distractors": 301,
+     "n_read_by_encoders": 301,
+     "n_read_by_cometkiwi": 200,
+     "source_tokens": 210.91558441558442,
+     "target_tokens": 255.54127433457137,
+     "target_tokens_by_lang": {
+      "de": 248.1139240506329,
+      "es": 241.21951219512195,
+      "fr": 272.84615384615387,
+      "ru": 259.9855072463768
+     },
+     "n_enough_by_lang": {
+      "de": 76,
+      "es": 81,
+      "fr": 78,
+      "ru": 66
+     }
+    },
+    "8": {
+     "n_windows": 308,
+     "n_enough_distractors": 301,
+     "n_read_by_encoders": 300,
+     "n_read_by_cometkiwi": 119,
+     "source_tokens": 242.10064935064935,
+     "target_tokens": 292.13635336545997,
+     "target_tokens_by_lang": {
+      "de": 283.46835443037975,
+      "es": 275.4756097560976,
+      "fr": 311.1666666666667,
+      "ru": 298.4347826086956
+     },
+     "n_enough_by_lang": {
+      "de": 76,
+      "es": 81,
+      "fr": 78,
+      "ru": 66
+     }
+    },
+    "9": {
+     "n_windows": 308,
+     "n_enough_distractors": 301,
+     "n_read_by_encoders": 298,
+     "n_read_by_cometkiwi": 55,
+     "source_tokens": 273.2597402597403,
+     "target_tokens": 328.9387418973678,
+     "target_tokens_by_lang": {
+      "de": 320.17721518987344,
+      "es": 310.4512195121951,
+      "fr": 350.8076923076923,
+      "ru": 334.3188405797101
+     },
+     "n_enough_by_lang": {
+      "de": 76,
+      "es": 81,
+      "fr": 78,
+      "ru": 66
+     }
+    },
+    "10": {
+     "n_windows": 308,
+     "n_enough_distractors": 303,
+     "n_read_by_encoders": 286,
+     "n_read_by_cometkiwi": 17,
+     "source_tokens": 304.10714285714283,
+     "target_tokens": 364.17668182645804,
+     "target_tokens_by_lang": {
+      "de": 353.9240506329114,
+      "es": 343.9878048780488,
+      "fr": 388.12820512820514,
+      "ru": 370.6666666666667
+     },
+     "n_enough_by_lang": {
+      "de": 78,
+      "es": 81,
+      "fr": 78,
+      "ru": 66
+     }
+    },
+    "11": {
+     "n_windows": 308,
+     "n_enough_distractors": 305,
+     "n_read_by_encoders": 269,
+     "n_read_by_cometkiwi": 9,
+     "source_tokens": 330.99675324675326,
+     "target_tokens": 396.201842751885,
+     "target_tokens_by_lang": {
+      "de": 384.873417721519,
+      "es": 374.0487804878049,
+      "fr": 422.7692307692308,
+      "ru": 403.1159420289855
+     },
+     "n_enough_by_lang": {
+      "de": 79,
+      "es": 81,
+      "fr": 78,
+      "ru": 67
+     }
+    },
+    "12": {
+     "n_windows": 308,
+     "n_enough_distractors": 305,
+     "n_read_by_encoders": 233,
+     "n_read_by_cometkiwi": 3,
+     "source_tokens": 358.8474025974026,
+     "target_tokens": 429.42645883520345,
+     "target_tokens_by_lang": {
+      "de": 417.2025316455696,
+      "es": 405.2073170731707,
+      "fr": 459.06410256410254,
+      "ru": 436.231884057971
+     },
+     "n_enough_by_lang": {
+      "de": 79,
+      "es": 81,
+      "fr": 78,
+      "ru": 67
+     }
+    },
+    "13": {
+     "n_windows": 308,
+     "n_enough_distractors": 307,
+     "n_read_by_encoders": 201,
+     "n_read_by_cometkiwi": 2,
+     "source_tokens": 389.00324675324674,
+     "target_tokens": 464.9548179620381,
+     "target_tokens_by_lang": {
+      "de": 451.54430379746833,
+      "es": 438.6707317073171,
+      "fr": 496.5897435897436,
+      "ru": 473.0144927536232
+     },
+     "n_enough_by_lang": {
+      "de": 79,
+      "es": 82,
+      "fr": 78,
+      "ru": 68
+     }
+    },
+    "14": {
+     "n_windows": 308,
+     "n_enough_distractors": 308,
+     "n_read_by_encoders": 160,
+     "n_read_by_cometkiwi": 0,
+     "source_tokens": 419.90909090909093,
+     "target_tokens": 502.3767874579702,
+     "target_tokens_by_lang": {
+      "de": 487.37974683544303,
+      "es": 474.7439024390244,
+      "fr": 535.9487179487179,
+      "ru": 511.4347826086956
+     },
+     "n_enough_by_lang": {
+      "de": 79,
+      "es": 82,
+      "fr": 78,
+      "ru": 69
+     }
+    }
+   }
+  },
+  "ntrex_minor": {
+   "corpus": "ntrex",
+   "edits": "minor",
+   "window": 14,
+   "n_sentences": {
+    "de": 1997,
+    "es": 1997,
+    "fr": 1997,
+    "ru": 1997
+   },
+   "perturbable": {
+    "antonym": {
+     "de": 607,
+     "es": 528,
+     "fr": 594,
+     "ru": 273
+    },
+    "number_near": {
+     "de": 481,
+     "es": 462,
+     "fr": 514,
+     "ru": 467
+    },
+    "entity_doc": {
+     "de": 1373,
+     "es": 1371,
+     "fr": 1367,
+     "ru": 1298
+    },
+    "omission": {
+     "de": 1903,
+     "es": 1894,
+     "fr": 1898,
+     "ru": 1930
+    },
+    "modality": {
+     "de": 296,
+     "es": 164,
+     "fr": 158,
+     "ru": 223
+    }
+   },
+   "by_k": {
+    "1": {
+     "n_windows": 253,
+     "n_enough_distractors": 0,
+     "n_read_by_encoders": 0,
+     "n_read_by_cometkiwi": 0,
+     "source_tokens": 16.470355731225297,
+     "target_tokens": 21.994834547530566,
+     "target_tokens_by_lang": {
+      "de": 20.307692307692307,
+      "es": 21.046875,
+      "fr": 23.385964912280702,
+      "ru": 23.238805970149254
+     },
+     "n_enough_by_lang": {
+      "de": 0,
+      "es": 0,
+      "fr": 0,
+      "ru": 0
+     }
+    },
+    "2": {
+     "n_windows": 253,
+     "n_enough_distractors": 129,
+     "n_read_by_encoders": 129,
+     "n_read_by_cometkiwi": 129,
+     "source_tokens": 52.40316205533597,
+     "target_tokens": 66.33285958240175,
+     "target_tokens_by_lang": {
+      "de": 63.676923076923075,
+      "es": 63.78125,
+      "fr": 70.35087719298245,
+      "ru": 67.5223880597015
+     },
+     "n_enough_by_lang": {
+      "de": 39,
+      "es": 31,
+      "fr": 31,
+      "ru": 28
+     }
+    },
+    "3": {
+     "n_windows": 253,
+     "n_enough_distractors": 212,
+     "n_read_by_encoders": 212,
+     "n_read_by_cometkiwi": 212,
+     "source_tokens": 89.65217391304348,
+     "target_tokens": 111.05490264391605,
+     "target_tokens_by_lang": {
+      "de": 106.64615384615385,
+      "es": 106.09375,
+      "fr": 119.6140350877193,
+      "ru": 111.86567164179104
+     },
+     "n_enough_by_lang": {
+      "de": 60,
+      "es": 54,
+      "fr": 47,
+      "ru": 51
+     }
+    },
+    "4": {
+     "n_windows": 253,
+     "n_enough_distractors": 238,
+     "n_read_by_encoders": 238,
+     "n_read_by_cometkiwi": 238,
+     "source_tokens": 122.20553359683794,
+     "target_tokens": 149.89806877177875,
+     "target_tokens_by_lang": {
+      "de": 142.96923076923076,
+      "es": 143.21875,
+      "fr": 162.50877192982455,
+      "ru": 150.8955223880597
+     },
+     "n_enough_by_lang": {
+      "de": 64,
+      "es": 63,
+      "fr": 52,
+      "ru": 59
+     }
+    },
+    "5": {
+     "n_windows": 253,
+     "n_enough_distractors": 246,
+     "n_read_by_encoders": 246,
+     "n_read_by_cometkiwi": 239,
+     "source_tokens": 153.04743083003953,
+     "target_tokens": 187.23045911950874,
+     "target_tokens_by_lang": {
+      "de": 179.66153846153847,
+      "es": 178.234375,
+      "fr": 202.47368421052633,
+      "ru": 188.55223880597015
+     },
+     "n_enough_by_lang": {
+      "de": 64,
+      "es": 64,
+      "fr": 56,
+      "ru": 62
+     }
+    },
+    "6": {
+     "n_windows": 253,
+     "n_enough_distractors": 249,
+     "n_read_by_encoders": 249,
+     "n_read_by_cometkiwi": 210,
+     "source_tokens": 184.02766798418972,
+     "target_tokens": 224.95550033234636,
+     "target_tokens_by_lang": {
+      "de": 216.8923076923077,
+      "es": 214.5,
+      "fr": 243.57894736842104,
+      "ru": 224.8507462686567
+     },
+     "n_enough_by_lang": {
+      "de": 64,
+      "es": 64,
+      "fr": 56,
+      "ru": 65
+     }
+    },
+    "7": {
+     "n_windows": 253,
+     "n_enough_distractors": 249,
+     "n_read_by_encoders": 249,
+     "n_read_by_cometkiwi": 158,
+     "source_tokens": 216.79446640316206,
+     "target_tokens": 263.6200839804016,
+     "target_tokens_by_lang": {
+      "de": 255.86153846153846,
+      "es": 249.5625,
+      "fr": 285.87719298245617,
+      "ru": 263.17910447761193
+     },
+     "n_enough_by_lang": {
+      "de": 64,
+      "es": 64,
+      "fr": 56,
+      "ru": 65
+     }
+    },
+    "8": {
+     "n_windows": 253,
+     "n_enough_distractors": 249,
+     "n_read_by_encoders": 248,
+     "n_read_by_cometkiwi": 90,
+     "source_tokens": 248.94466403162056,
+     "target_tokens": 301.8501001445203,
+     "target_tokens_by_lang": {
+      "de": 292.7692307692308,
+      "es": 285.3125,
+      "fr": 327.03508771929825,
+      "ru": 302.2835820895522
+     },
+     "n_enough_by_lang": {
+      "de": 64,
+      "es": 64,
+      "fr": 56,
+      "ru": 65
+     }
+    },
+    "9": {
+     "n_windows": 253,
+     "n_enough_distractors": 249,
+     "n_read_by_encoders": 247,
+     "n_read_by_cometkiwi": 39,
+     "source_tokens": 281.25691699604744,
+     "target_tokens": 340.3699286179175,
+     "target_tokens_by_lang": {
+      "de": 330.4307692307692,
+      "es": 321.765625,
+      "fr": 369.29824561403507,
+      "ru": 339.9850746268657
+     },
+     "n_enough_by_lang": {
+      "de": 64,
+      "es": 64,
+      "fr": 56,
+      "ru": 65
+     }
+    },
+    "10": {
+     "n_windows": 253,
+     "n_enough_distractors": 250,
+     "n_read_by_encoders": 236,
+     "n_read_by_cometkiwi": 11,
+     "source_tokens": 312.3517786561265,
+     "target_tokens": 376.0062750833384,
+     "target_tokens_by_lang": {
+      "de": 365.3076923076923,
+      "es": 355.34375,
+      "fr": 407.4035087719298,
+      "ru": 375.97014925373134
+     },
+     "n_enough_by_lang": {
+      "de": 64,
+      "es": 64,
+      "fr": 56,
+      "ru": 66
+     }
+    },
+    "11": {
+     "n_windows": 253,
+     "n_enough_distractors": 253,
+     "n_read_by_encoders": 223,
+     "n_read_by_cometkiwi": 4,
+     "source_tokens": 340.42292490118575,
+     "target_tokens": 409.5890004210979,
+     "target_tokens_by_lang": {
+      "de": 397.96923076923076,
+      "es": 387.234375,
+      "fr": 444.42105263157896,
+      "ru": 408.7313432835821
+     },
+     "n_enough_by_lang": {
+      "de": 65,
+      "es": 64,
+      "fr": 57,
+      "ru": 67
+     }
+    },
+    "12": {
+     "n_windows": 253,
+     "n_enough_distractors": 253,
+     "n_read_by_encoders": 198,
+     "n_read_by_cometkiwi": 0,
+     "source_tokens": 369.7312252964427,
+     "target_tokens": 444.69086151353554,
+     "target_tokens_by_lang": {
+      "de": 432.2769230769231,
+      "es": 420.09375,
+      "fr": 483.63157894736844,
+      "ru": 442.76119402985074
+     },
+     "n_enough_by_lang": {
+      "de": 65,
+      "es": 64,
+      "fr": 57,
+      "ru": 67
+     }
+    },
+    "13": {
+     "n_windows": 253,
+     "n_enough_distractors": 253,
+     "n_read_by_encoders": 165,
+     "n_read_by_cometkiwi": 0,
+     "source_tokens": 401.9288537549407,
+     "target_tokens": 482.49825702270533,
+     "target_tokens_by_lang": {
+      "de": 469.18461538461537,
+      "es": 456.984375,
+      "fr": 524.421052631579,
+      "ru": 479.4029850746269
+     },
+     "n_enough_by_lang": {
+      "de": 65,
+      "es": 64,
+      "fr": 57,
+      "ru": 67
+     }
+    },
+    "14": {
+     "n_windows": 253,
+     "n_enough_distractors": 253,
+     "n_read_by_encoders": 129,
+     "n_read_by_cometkiwi": 0,
+     "source_tokens": 433.29249011857706,
+     "target_tokens": 520.8774168599059,
+     "target_tokens_by_lang": {
+      "de": 506.4923076923077,
+      "es": 494.890625,
+      "fr": 565.6491228070175,
+      "ru": 516.4776119402985
+     },
+     "n_enough_by_lang": {
+      "de": 65,
+      "es": 64,
+      "fr": 57,
+      "ru": 67
+     }
+    }
+   }
+  }
+ }
+}

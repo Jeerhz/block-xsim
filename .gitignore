@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+.env
+
+# corpora, datasets, scores and caches are rebuilt, never committed (FLORES+ must not be re-hosted)
+data/
+logs/
