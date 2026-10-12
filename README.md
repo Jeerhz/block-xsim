@@ -28,6 +28,9 @@ Five models are compared:
 
 ## Results
 
+Every scored block (distractors and the score of each model) is on the Hugging Face Hub:
+[AdleBenSalem/block-xsim](https://huggingface.co/datasets/AdleBenSalem/block-xsim).
+
 `results/` holds one file per corpus and edit set (`flores_xsim.json`, `flores_minor.json`,
 `ntrex_xsim.json`, `ntrex_minor.json`) and `corpus_statistics.json`; see
 [`results/README.md`](results/README.md). Read them with the core install (pydantic, numpy):
