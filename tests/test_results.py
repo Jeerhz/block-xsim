@@ -16,7 +16,8 @@ def test_every_corpus_and_edit_set_is_there():
     assert [p.stem for p in EVALUATIONS] == ["flores_minor", "flores_xsim", "ntrex_minor", "ntrex_xsim"]
 
 
-@pytest.mark.parametrize("path", [*EVALUATIONS, RESULTS_DIR / "corpus_statistics.json"], ids=lambda p: p.stem)
+@pytest.mark.parametrize("path", [*EVALUATIONS, *sorted(RESULTS_DIR.glob("metricx_bleu/*.json")),
+                                  RESULTS_DIR / "corpus_statistics.json"], ids=lambda p: f"{p.parent.name}/{p.stem}")
 def test_files_round_trip(path):
     model = CorpusStatisticsResult if path.stem == "corpus_statistics" else EvaluationResult
     assert model.load(path).model_dump(mode="json") == json.loads(path.read_text(encoding="utf-8"))

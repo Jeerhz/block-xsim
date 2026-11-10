@@ -24,3 +24,19 @@ under other batch sizes. That rerun produced the scores of the published dataset
 NTREX xSIM++, CometKiwi, fr, k = 11 had a 1-block cell in the `every_3rd` and `one_sentence`
 regimes only, which is removed here. The k = 11 means of these two regimes therefore cover
 7 blocks (de, es) instead of 8.
+
+## MetricX-24 and BLEU (`metricx_bleu/`)
+
+`metricx_bleu/<corpus>_<edits>.json` holds two more scorers, run on 2026-11-10 on the same blocks and distractors:
+
+- **`metricx-qe`:** MetricX-24 hybrid XL (`google/metricx-24-hybrid-xl-v2p6-bfloat16`) in QE mode, reading source and candidate.
+  - Its error score (0 to 25) is negated, so higher is better.
+  - A block is kept when source and candidate fit in 1,536 mT5 tokens, counted with `google/mt5-xl`.
+- **`bleu`:** sentence BLEU (sacrebleu, 13a, effective order) of each candidate against the reference block.
+  - The reference scores 100 against itself, so its accuracy is 1 by construction.
+  - Its score difference is 100 minus the BLEU of the distractor.
+
+Two caveats apply:
+
+- Only FLORES+ is here; the NTREX-128 runs were still in progress.
+- MetricX is computed with the transformers MT5 model and the official weights, following the official code: input format, final EOS removed, logit of `<extra_id_10>`, clamp. Its numbers have not yet been compared with the official `metricx24.predict` script.
