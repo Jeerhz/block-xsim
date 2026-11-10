@@ -70,6 +70,7 @@ def test_truncation_rule():
     assert fits("cosine", 500, 510, 512) and not fits("cosine", 500, 511, 512)
     assert fits("score", 250, 257, 512) and not fits("score", 250, 258, 512)
     assert fits("score", 10_000, 10_000, 0)
+    assert fits("reference", 10_000, 10_000, 512)                # BLEU reads any length
 
 
 def test_protocol_keeps_blocks_with_enough_distractors_in_every_regime(block):
@@ -120,7 +121,7 @@ def test_merge_joins_regimes_and_refuses_duplicates():
 class UppercaseScorer:
     """Scores a candidate by minus its number of capitals: the lower-case reference always wins."""
 
-    def score(self, sources, candidates, pairs):
+    def score(self, sources, candidates, pairs, references):
         return np.array([-sum(ch.isupper() for ch in candidates[c]) for _q, c in pairs], dtype=float)
 
 
@@ -135,7 +136,7 @@ def test_evaluate_then_export(tmp_path, monkeypatch, block):
     blocks = [block, block.model_copy(update={"id": "de-w001-k3", "window": 1})]
     write_jsonl(files.blocks_path("flores", "xsim", "de"), blocks)
     config = EvaluationConfig(corpus="flores", edits="xsim", langs=["de"], k_list=[3], n_distractors=2,
-                              max_combos=64, max_tokens=512, seed=0)
+                              max_combos=64, max_tokens=512, tokenizer="xlm-roberta-large", seed=0)
     groups = {("de", 3): BlockGroup.build(blocks, 64, 0, lambda t: len(t.split()))}
     regimes: dict[str, RegimeCells] = {}
     for regime in REGIMES:

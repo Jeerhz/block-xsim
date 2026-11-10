@@ -67,8 +67,9 @@ def distractors(block: Block, regime: str, max_combos: int | None = None, seed: 
 
 def fits(rule: str, source_tokens: int, candidate_tokens: int, max_tokens: int) -> bool:
     """Whether a scorer reads the whole input: an encoder embeds each side alone, CometKiwi
-    reads `mt </s></s> src` as one sequence (COMET keeps 5 positions for special tokens)."""
-    if max_tokens <= 0:
+    and MetricX read source and candidate as one sequence (5 positions kept for special
+    tokens and prefixes), BLEU has no limit."""
+    if max_tokens <= 0 or rule == "reference":
         return True
     if rule == "score":
         return source_tokens + candidate_tokens <= max_tokens - 5
@@ -81,6 +82,7 @@ class BlockGroup:
 
     blocks: list[Block]
     distractors: dict[str, list[list[Distractor]]]  # regime -> block -> distractors
+    source_tokens: list[int]                        # block -> tokens of the source
     longest: dict[str, list[int]]                   # regime -> block -> tokens of the longest candidate
 
     @classmethod
@@ -90,10 +92,10 @@ class BlockGroup:
         ds = {r: [distractors(b, r, max_combos, seed) for b in blocks] for r in REGIMES}
         longest = {r: [max(n_tokens(t) for t in [b.reference] + [d.text for d in dist])
                        for b, dist in zip(blocks, ds[r])] for r in REGIMES}
-        return cls(blocks, ds, longest)
+        return cls(blocks, ds, [n_tokens(b.source) for b in blocks], longest)
 
     def protocol(self, rule: str, n_distractors: int, max_tokens: int) -> list[int]:
         """Indices of the blocks with at least D distractors in every regime that the scorer reads whole."""
-        return [i for i, b in enumerate(self.blocks)
+        return [i for i in range(len(self.blocks))
                 if all(len(self.distractors[r][i]) >= n_distractors
-                       and fits(rule, b.source_n_tokens, self.longest[r][i], max_tokens) for r in REGIMES)]
+                       and fits(rule, self.source_tokens[i], self.longest[r][i], max_tokens) for r in REGIMES)]

@@ -18,4 +18,5 @@ source slurm/env.sh
 srun python -m block_xsim.evaluate --corpus "${CORPUS:-flores}" --edits "${EDITS:-xsim}" \
   --langs ${LANGS:-de es fr ru} --scorers ${SCORERS:-cometkiwi comet-da xlm-r labse me5} \
   --regimes ${REGIMES:-every_sentence every_2nd every_3rd one_sentence} \
+  --max_tokens "${MAX_TOKENS:-512}" --tokenizer "${TOKENIZER:-xlm-roberta-large}" \
   --batch_size "${BATCH_SIZE:-32}" ${OUTPUT:+--output "$OUTPUT"}

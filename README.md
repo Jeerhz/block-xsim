@@ -21,10 +21,16 @@ Two edit sets are applied to the target side with spaCy:
 - **xSIM++ edits**: causality, entity, number.
 - **Minor edits**: antonym, nearby number, document entity, omission, modality. These edits read fluently, and only the source reveals them.
 
-Five models are compared:
+Five models are compared in the paper:
 
 - the CometKiwi score;
 - the cosine similarity of the COMET-DA encoder, XLM-R (mean pooled), LaBSE and multilingual-E5.
+
+Two more metrics can be run on the same protocol:
+
+- `metricx-qe`: MetricX-24 hybrid XL in QE mode, which reads 1,536 mT5 tokens.
+  Run it with `--max_tokens 1536 --tokenizer google/mt5-xl`.
+- `bleu`: sentence BLEU against the reference block. The reference scores 100 against itself, so only the score difference is informative.
 
 ## Results
 
@@ -98,7 +104,7 @@ The edits come from spaCy small models. Other model versions may edit other word
 | `lexicons.py` · `perturber.py` | the edits (spaCy) |
 | `regimes.py` | the distractors of each regime, the truncation rule, the blocks kept |
 | `metrics.py` | accuracy, pairwise win rate, absolute difference, language means |
-| `scorers.py` | the five models; add one to `SCORERS` to evaluate it |
+| `scorers.py` | the models and their rules (score, cosine, reference); add one to `SCORERS` to evaluate it |
 | `files.py` | where every file lives under `data/` |
 | `download_corpora.py` · `build_blocks.py` · `evaluate.py` · `merge_results.py` · `corpus_statistics.py` · `export_scored_blocks.py` | the scripts, in pipeline order (`python -m block_xsim.<script> --help`) |
 

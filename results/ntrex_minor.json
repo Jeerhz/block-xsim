@@ -28,6 +28,7 @@
   "n_distractors": 5,
   "max_combos": 64,
   "max_tokens": 512,
+  "tokenizer": "xlm-roberta-large",
   "seed": 0
  },
  "scorers": {

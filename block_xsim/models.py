@@ -148,7 +148,7 @@ class RegimeCells(Model):
 
 
 class ScorerCells(Model):
-    rule: Literal["score", "cosine"]
+    rule: Literal["score", "cosine", "reference"]
     regimes: dict[str, RegimeCells]
 
 
@@ -160,6 +160,7 @@ class EvaluationConfig(Model):
     n_distractors: int                              # D
     max_combos: int                                 # distractors sampled per block and regime
     max_tokens: int                                 # blocks a scorer would truncate are left out
+    tokenizer: str                                  # counts those tokens: the scorers' tokenizer
     seed: int                                       # distractor samples
 
 

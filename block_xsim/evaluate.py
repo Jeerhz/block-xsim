@@ -29,8 +29,8 @@ from block_xsim.metrics import cell_metrics, mean_by_k
 from block_xsim.models import (BlockScores, CellMetrics, EvaluationConfig, EvaluationResult,
                                RegimeCells, ScorerCells, write_jsonl)
 from block_xsim.perturber import EDIT_SETS
-from block_xsim.regimes import REGIMES, BlockGroup, token_counter
-from block_xsim.scorers import SCORERS, Scorer
+from block_xsim.regimes import REGIMES, TOKENIZER, BlockGroup, token_counter
+from block_xsim.scorers import DEFAULT_SCORERS, SCORERS, Scorer
 
 MIN_BLOCKS = 2
 
@@ -43,7 +43,8 @@ def score_group(scorer: Scorer, group: BlockGroup, regime: str, kept: list[int])
         pairs += [(q, len(candidates) + c) for c in range(len(texts))]
         candidates += texts
         sources.append(group.blocks[i].source)
-    scores = np.asarray(scorer.score(sources, candidates, pairs), dtype=float).tolist()
+    references = [group.blocks[i].reference for i in kept]
+    scores = np.asarray(scorer.score(sources, candidates, pairs, references), dtype=float).tolist()
     out, s = [], 0
     for i in kept:
         m = len(group.distractors[regime][i])
@@ -75,12 +76,15 @@ def main() -> None:
     ap.add_argument("--corpus", choices=list(CORPORA), required=True)
     ap.add_argument("--edits", choices=list(EDIT_SETS), required=True)
     ap.add_argument("--langs", nargs="+", default=["de", "es", "fr", "ru"])
-    ap.add_argument("--scorers", nargs="+", choices=list(SCORERS), default=list(SCORERS))
+    ap.add_argument("--scorers", nargs="+", choices=list(SCORERS), default=list(DEFAULT_SCORERS))
     ap.add_argument("--regimes", nargs="+", choices=REGIMES, default=list(REGIMES),
                     help="Regimes to score; the protocol always looks at all four.")
     ap.add_argument("--n_distractors", type=int, default=5, help="D")
     ap.add_argument("--max_combos", type=int, default=64)
-    ap.add_argument("--max_tokens", type=int, default=512, help="XLM-R tokens a scorer reads.")
+    ap.add_argument("--max_tokens", type=int, default=512,
+                    help="Tokens a scorer reads: 512 for the COMET models, 1536 for MetricX-24.")
+    ap.add_argument("--tokenizer", default=TOKENIZER,
+                    help="Counts the tokens: xlm-roberta-large for COMET, google/mt5-xl for MetricX-24.")
     ap.add_argument("--seed", type=int, default=0, help="Distractor samples.")
     ap.add_argument("--batch_size", type=int, default=32)
     ap.add_argument("--output", type=Path, default=None, help="Default: results/<corpus>_<edits>.json")
@@ -89,7 +93,7 @@ def main() -> None:
     config = EvaluationConfig(corpus=args.corpus, edits=args.edits, langs=args.langs,
                               k_list=list(range(1, CORPORA[args.corpus].window + 1)),
                               n_distractors=args.n_distractors, max_combos=args.max_combos,
-                              max_tokens=args.max_tokens, seed=args.seed)
+                              max_tokens=args.max_tokens, tokenizer=args.tokenizer, seed=args.seed)
     output = args.output or RESULTS_DIR / f"{args.corpus}_{args.edits}.json"
     result = EvaluationResult(timestamp="", config=config, scorers={})
     if output.is_file():
@@ -97,7 +101,7 @@ def main() -> None:
         if result.config != config:
             raise SystemExit(f"{output} holds another configuration: give another --output")
 
-    n_tokens = token_counter()
+    n_tokens = token_counter(config.tokenizer)
     groups: dict[tuple[str, int], BlockGroup] = {}
     for lang in config.langs:
         blocks = load_blocks(config.corpus, config.edits, lang)

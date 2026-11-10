@@ -1,10 +1,13 @@
-"""The five models and the two decision rules.
+"""The models and their decision rules.
 
-    score    the metric's own score, COMET(src = English block, mt = candidate), for a
-             reference-free checkpoint (CometKiwi)
-    cosine   the cosine between the embeddings of the English block and of the candidate
+    score      the metric's own score of (source block, candidate), for a reference-free
+               metric: CometKiwi, MetricX-24 in QE mode
+    cosine     the cosine between the embeddings of the English block and of the candidate
+    reference  a reference-based metric (BLEU): the candidate is compared with the reference
+               block, which then scores best against itself; only the score difference is
+               informative
 
-To evaluate another model, add an entry to SCORERS.
+To evaluate another model, add an entry to SCORERS. DEFAULT_SCORERS are the five of the paper.
 """
 from __future__ import annotations
 
@@ -103,10 +106,13 @@ class CometEncoder(Encoder):
 
 # ── scorers ───────────────────────────────────────────────────────────────────
 class Scorer(ABC):
+    rule = "score"
+
     @abstractmethod
-    def score(self, sources: list[str], candidates: list[str],
-              pairs: list[tuple[int, int]]) -> np.ndarray:
-        """One score per (source index, candidate index) pair; higher is a better match."""
+    def score(self, sources: list[str], candidates: list[str], pairs: list[tuple[int, int]],
+              references: list[str]) -> np.ndarray:
+        """One score per (source index, candidate index) pair; higher is a better match.
+        `references[q]` is the reference block of source q."""
 
 
 class QualityScorer(Scorer):
@@ -124,7 +130,7 @@ class QualityScorer(Scorer):
         self.batch_size, self.gpus = batch_size, int(torch.cuda.is_available())
         self.cache: dict[tuple[str, str], float] = {}
 
-    def score(self, sources, candidates, pairs):
+    def score(self, sources, candidates, pairs, references):
         todo = sorted({(sources[q], candidates[c]) for q, c in pairs} - self.cache.keys())
         if todo:
             out = self.model.predict([{"src": s, "mt": m} for s, m in todo], batch_size=self.batch_size,
@@ -133,8 +139,75 @@ class QualityScorer(Scorer):
         return np.array([self.cache[(sources[q], candidates[c])] for q, c in pairs])
 
 
+class MetricXScorer(Scorer):
+    """MetricX-24 in QE mode, computed as in google-research/metricx (metricx24/predict.py and
+    models.py): the input "source: <src> candidate: <mt>" in the mT5 tokenizer, cut to 1536
+    tokens, final EOS removed; one decoder step from token 0; the prediction is the logit of
+    <extra_id_10> (id 250089) clamped to [0, 25]. It is an error score, so the score is its negative."""
+
+    TOKEN = 250089
+
+    def __init__(self, model_id: str, batch_size: int, tokenizer_id: str = "google/mt5-xl",
+                 max_length: int = 1536):
+        import torch
+        from transformers import AutoTokenizer, MT5ForConditionalGeneration
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.tok = AutoTokenizer.from_pretrained(tokenizer_id)
+        self.model = MT5ForConditionalGeneration.from_pretrained(model_id, torch_dtype="auto").eval().to(self.device)
+        self.batch_size, self.max_length = batch_size, max_length
+        self.cache: dict[tuple[str, str], float] = {}
+        self.n_truncated = 0
+
+    def predict(self, texts: list[str]) -> list[float]:
+        import torch
+        from tqdm import tqdm
+        ids = [self.tok(t, max_length=self.max_length, truncation=True)["input_ids"] for t in texts]
+        self.n_truncated += sum(len(x) == self.max_length for x in ids)
+        ids = [x[:-1] for x in ids]
+        order = sorted(range(len(ids)), key=lambda i: -len(ids[i]))          # batches of similar length
+        out = [0.0] * len(ids)
+        with torch.no_grad():
+            for s in tqdm(range(0, len(order), self.batch_size), leave=False):
+                batch = order[s:s + self.batch_size]
+                width = max(len(ids[i]) for i in batch)
+                x = torch.tensor([ids[i] + [self.tok.pad_token_id] * (width - len(ids[i])) for i in batch],
+                                 device=self.device)
+                mask = (torch.arange(width, device=self.device)[None, :]
+                        < torch.tensor([len(ids[i]) for i in batch], device=self.device)[:, None]).long()
+                start = torch.zeros((len(batch), 1), dtype=torch.long, device=self.device)
+                logits = self.model(input_ids=x, attention_mask=mask, decoder_input_ids=start).logits
+                for i, v in zip(batch, logits[:, 0, self.TOKEN].float().clamp(0, 25).tolist()):
+                    out[i] = v
+        return out
+
+    def score(self, sources, candidates, pairs, references):
+        todo = sorted({(sources[q], candidates[c]) for q, c in pairs} - self.cache.keys())
+        if todo:
+            errors = self.predict([f"source: {s} candidate: {m}" for s, m in todo])
+            self.cache.update(zip(todo, (-e for e in errors)))
+            if self.n_truncated:
+                logger.warning(f"MetricX: {self.n_truncated} inputs cut at {self.max_length} tokens so far")
+        return np.array([self.cache[(sources[q], candidates[c])] for q, c in pairs])
+
+
+class BleuScorer(Scorer):
+    """Sentence BLEU of the candidate against the reference block (sacrebleu, 13a tokenisation,
+    effective order), on a 0-100 scale."""
+
+    rule = "reference"
+
+    def __init__(self):
+        from sacrebleu.metrics import BLEU
+        self.bleu = BLEU(effective_order=True)
+
+    def score(self, sources, candidates, pairs, references):
+        return np.array([self.bleu.sentence_score(candidates[c], [references[q]]).score for q, c in pairs])
+
+
 class CosineScorer(Scorer):
     """Cosine of the embeddings, cached on disk per (encoder, exact list of texts)."""
+
+    rule = "cosine"
 
     def __init__(self, encoder: Encoder, batch_size: int, cache_dir: Path):
         self.encoder, self.batch_size, self.cache_dir = encoder, batch_size, cache_dir
@@ -152,7 +225,7 @@ class CosineScorer(Scorer):
         np.save(path, out)
         return out
 
-    def score(self, sources, candidates, pairs):
+    def score(self, sources, candidates, pairs, references):
         q, c = self.embed(sources), self.embed(candidates)
         qi, ci = (np.array(x, dtype=int) for x in zip(*pairs))
         return np.einsum("ij,ij->i", q[qi], c[ci])
@@ -161,25 +234,30 @@ class CosineScorer(Scorer):
 # ── registry ──────────────────────────────────────────────────────────────────
 @dataclass(frozen=True)
 class ScorerSpec:
-    model_id: str
-    encoder: type[Encoder] | None = None            # None: the score rule
+    kind: type                                      # an Encoder (cosine rule) or a Scorer
+    model_id: str = ""
 
     @property
     def rule(self) -> str:
-        return "score" if self.encoder is None else "cosine"
+        return "cosine" if issubclass(self.kind, Encoder) else self.kind.rule
 
     def build(self, batch_size: int, cache_dir: Path) -> Scorer:
-        if self.encoder is None:
-            return QualityScorer(self.model_id, batch_size)
-        import torch
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        return CosineScorer(self.encoder(self.model_id, device), batch_size, cache_dir)
+        if issubclass(self.kind, Encoder):
+            import torch
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            return CosineScorer(self.kind(self.model_id, device), batch_size, cache_dir)
+        if self.kind is BleuScorer:
+            return BleuScorer()
+        return self.kind(self.model_id, batch_size)
 
 
 SCORERS: dict[str, ScorerSpec] = {
-    "cometkiwi": ScorerSpec("Unbabel/wmt22-cometkiwi-da"),
-    "comet-da": ScorerSpec("Unbabel/wmt22-comet-da", CometEncoder),
-    "xlm-r": ScorerSpec("xlm-roberta-large", MeanPoolEncoder),
-    "labse": ScorerSpec("setu4993/LaBSE", LabseEncoder),
-    "me5": ScorerSpec("intfloat/multilingual-e5-base", E5Encoder),
+    "cometkiwi": ScorerSpec(QualityScorer, "Unbabel/wmt22-cometkiwi-da"),
+    "comet-da": ScorerSpec(CometEncoder, "Unbabel/wmt22-comet-da"),
+    "xlm-r": ScorerSpec(MeanPoolEncoder, "xlm-roberta-large"),
+    "labse": ScorerSpec(LabseEncoder, "setu4993/LaBSE"),
+    "me5": ScorerSpec(E5Encoder, "intfloat/multilingual-e5-base"),
+    "metricx-qe": ScorerSpec(MetricXScorer, "google/metricx-24-hybrid-xl-v2p6-bfloat16"),
+    "bleu": ScorerSpec(BleuScorer),
 }
+DEFAULT_SCORERS = ("cometkiwi", "comet-da", "xlm-r", "labse", "me5")

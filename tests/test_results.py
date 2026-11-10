@@ -7,7 +7,7 @@ from block_xsim import RESULTS_DIR
 from block_xsim.metrics import mean_by_k
 from block_xsim.models import CorpusStatisticsResult, EvaluationResult
 from block_xsim.regimes import REGIMES
-from block_xsim.scorers import SCORERS
+from block_xsim.scorers import DEFAULT_SCORERS, SCORERS
 
 EVALUATIONS = sorted(p for p in RESULTS_DIR.glob("*_*.json") if p.stem != "corpus_statistics")
 
@@ -25,7 +25,7 @@ def test_files_round_trip(path):
 @pytest.mark.parametrize("path", EVALUATIONS, ids=lambda p: p.stem)
 def test_regimes_share_their_blocks_and_means_are_recomputable(path):
     result = EvaluationResult.load(path)
-    assert set(result.scorers) == set(SCORERS)
+    assert set(result.scorers) == set(DEFAULT_SCORERS)
     for name, cells in result.scorers.items():
         assert cells.rule == SCORERS[name].rule and set(cells.regimes) == set(REGIMES)
         counts = {r: {(lang, k): c.n_blocks for lang, byk in rc.by_lang.items() for k, c in byk.items()}
