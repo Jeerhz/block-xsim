@@ -40,3 +40,26 @@ Two caveats apply:
 
 - Only FLORES+ is here; the NTREX-128 runs were still in progress.
 - MetricX is computed with the transformers MT5 model and the official weights, following the official code: input format, final EOS removed, logit of `<extra_id_10>`, clamp. Its numbers have not yet been compared with the official `metricx24.predict` script.
+
+## Verification (2026-11-11)
+
+Checks made on the published dataset (German and French NTREX, German FLORES+), the public
+NTREX text and the code, after MetricX and BLEU showed the same one-error profile as CometKiwi.
+
+What was verified and holds:
+
+- Every distractor differs from the reference exactly at its stated positions (320,000 distractors checked); none is an exact duplicate; source and reference are the official NTREX lines in order; the block of length k+1 extends the block of length k.
+- Every committed cell is recomputable from the per-candidate scores of the dataset to within 0.004 in accuracy (near-ties under another batch size). Ties are below 0.1 %.
+- The curves keep their shape on a fixed set of windows (those kept at the shortest k), so the block set growing with k does not create them.
+- The perturber does what each category says on 800 NTREX sentences (lexicon pairs, same-width digit scrambles, ±1 digits, subsequence omissions, window entities).
+- BLEU recomputed locally falls exactly as 1/k under one error (fitted exponent −1.0) and is flat with one error per sentence: an n-gram average cannot do otherwise. BLEU is the null model of pure dilution, which is why its one-error curve matches CometKiwi's. The decay exponents differ: BLEU −1.0, CometKiwi −0.75 (xSIM++) and −0.99 (minor), MetricX −0.46 and −0.71.
+- The QE metrics receive the English source and the candidate only; BLEU receives the candidate and the reference.
+
+Biases found, none of which changes the dilution conclusions (they hold on the minor edits, which have no negation):
+
+- **Inserted negations are often ungrammatical.** They are 72 % of the causality edits, so about a third of the xSIM++ single edits in German and French. On 20 hand-judged sentences per language, 9 (de) and 10 (fr) were ungrammatical: German puts *nicht* after the finite verb even in verb-final clauses ("…erstochen wurde nicht"), French anchors *ne* before subject and relative pronouns ("n'Il a pas", "ne qui se trouvait pas"). CometKiwi detects the fluent causality edits as well as the inserted negations (.93 to 1.00), so its causality level stands; the encoders' levels mix meaning and fluency (LaBSE on German: .81 on inserted negations, .53 on removed ones).
+- **The entity bank carries NER noise** from the small spaCy models: about 6 % of entity edits replace or insert a non-entity ("Los Angeles" → "lautstark"). Detection on these is not higher than on clean spans.
+- **One edit can reach the same text through two categories** ("Premier League" → "Dernier League" as antonym and as ordinal, 29 French distractor pairs differing in spacing), and one case-only entity edit exists ("Walisischen" → "walisischen", one German window). `check_blocks.py` now reports both.
+- An omission can drop an obligatory word ("seit langer Zeit" → "seit Zeit"); the first sentence of a NTREX window is usually a headline; at odd k the every-2nd regime edits slightly more than half of the sentences; the k = 2 cells rest on 24 to 40 windows per language.
+
+Not verified: the MetricX scores against the official `metricx24.predict` script (needs a GPU), and the Spanish and Russian edits.
