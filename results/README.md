@@ -25,6 +25,8 @@ NTREX xSIM++, CometKiwi, fr, k = 11 had a 1-block cell in the `every_3rd` and `o
 regimes only, which is removed here. The k = 11 means of these two regimes therefore cover
 7 blocks (de, es) instead of 8.
 
+On 2026-11-11 every file was recomputed from the per-candidate scores with `recompute_cells` (job 5788461, CPU) to add the signed score difference and the margin. Block counts are unchanged; absolute differences agree within 2e-7; accuracies move by at most 0.0095 in one cell (near-ties of the 2026-10-10 rerun, whose scores these are) and 0.003 in a language mean.
+
 ## MetricX-24 and BLEU (`metricx_bleu/`)
 
 `metricx_bleu/<corpus>_<edits>.json` holds two more scorers, run on 2026-11-10 on the same blocks and distractors:
@@ -38,7 +40,7 @@ regimes only, which is removed here. The k = 11 means of these two regimes there
 
 Two caveats apply:
 
-- Only FLORES+ is here; the NTREX-128 runs were still in progress.
+- The NTREX-128 files (jobs 5771116-17 and 5771126-33, completed 2026-11-11) were joined from their per-regime parts with `recompute_cells --output`.
 - MetricX is computed with the transformers MT5 model and the official weights, following the official code: input format, final EOS removed, logit of `<extra_id_10>`, clamp. Its numbers have not yet been compared with the official `metricx24.predict` script.
 
 ## Verification (2026-11-11)

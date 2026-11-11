@@ -46,16 +46,18 @@ from block_xsim.models import EvaluationResult
 
 result = EvaluationResult.load("results/ntrex_xsim.json")
 cell = result.scorers["cometkiwi"].regimes["one_sentence"].mean_by_k["7"]
-print(cell.n_blocks, cell.accuracy, cell.abs_difference)
+print(cell.n_blocks, cell.accuracy, cell.difference, cell.margin)
 ```
 
-The cells hold three measures:
+The cells hold five measures:
 
 - **Alignment accuracy** is P[the reference scores above D distractors], with chance at 1/(D+1).
 - **Pairwise win rate** is the share of distractors that score below the reference.
-- **Absolute score difference** is the mean of |score(reference) − score(distractor)|.
+- **Score difference** is the mean of score(reference) − score(distractor), negative when the model prefers the distractors.
+- **Margin** is score(reference) − the highest score among D distractors, averaged over every draw of D; positive exactly when the reference wins.
+- **Absolute score difference** is the mean of |score(reference) − score(distractor)|; it counts a distractor scored above the reference as a gain, and is kept for comparison only.
 
-Each measure is given overall, by position of the first edited sentence and by edit category, per language and averaged over languages.
+Each measure is given overall (the margin only overall), by position of the first edited sentence and by edit category, per language and averaged over languages.
 
 ## Protocol
 
@@ -103,10 +105,10 @@ The edits come from spaCy small models. Other model versions may edit other word
 | `corpora.py` | FLORES+ and NTREX-128 settings and fetchers, windows |
 | `lexicons.py` · `perturber.py` | the edits (spaCy) |
 | `regimes.py` | the distractors of each regime, the truncation rule, the blocks kept |
-| `metrics.py` | accuracy, pairwise win rate, absolute difference, language means |
+| `metrics.py` | accuracy, pairwise win rate, score differences, margin, language means |
 | `scorers.py` | the models and their rules (score, cosine, reference); add one to `SCORERS` to evaluate it |
 | `files.py` | where every file lives under `data/` |
-| `download_corpora.py` · `build_blocks.py` · `evaluate.py` · `merge_results.py` · `corpus_statistics.py` · `export_scored_blocks.py` | the scripts, in pipeline order (`python -m block_xsim.<script> --help`) |
+| `download_corpora.py` · `build_blocks.py` · `evaluate.py` · `merge_results.py` · `corpus_statistics.py` · `export_scored_blocks.py` · `recompute_cells.py` | the scripts, in pipeline order (`python -m block_xsim.<script> --help`) |
 
 ## Data and licences
 

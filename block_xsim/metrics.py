@@ -1,8 +1,13 @@
-"""Alignment accuracy, pairwise win rate and absolute score difference of a cell.
+"""Alignment accuracy, pairwise win rate, score difference and margin of a cell.
 
 With w of a block's m distractors scored strictly below the reference (a tie counts against
 it), the accuracy against D distractors drawn at random is C(w, D) / C(m, D), averaged over
 every D-subset in closed form. Chance is 1 / (D + 1).
+
+The score difference is the mean of score(reference) - score(distractor): positive when the
+model places the reference above its distractors, negative when it prefers them. The margin
+is score(reference) minus the highest score among D distractors drawn at random, averaged
+over every D-subset in closed form: positive exactly when the reference wins the draw.
 """
 from __future__ import annotations
 
@@ -18,11 +23,20 @@ def accuracy(w: int, m: int, n_distractors: int) -> float:
     return comb(w, n_distractors) / comb(m, n_distractors)
 
 
+def margin(reference: float, distractors: Sequence[float], n_distractors: int) -> float:
+    """E[reference - max of D distractors drawn at random]: the j-th highest of m distractors
+    is the highest of C(m - j, D - 1) of the C(m, D) draws."""
+    x = np.sort(np.asarray(distractors, dtype=float))[::-1]
+    m = len(x)
+    p = np.array([comb(m - j, n_distractors - 1) for j in range(1, m + 1)]) / comb(m, n_distractors)
+    return float(reference - p @ x)
+
+
 def cell_metrics(scores: Sequence[CandidateScores], distractors: Sequence[Sequence[Distractor]],
                  source_tokens: Sequence[int], n_distractors: int) -> CellMetrics:
     """The cell of the given blocks; group pairs by first perturbed sentence and, for the
     distractors whose edits share one category, by category."""
-    acc, win, diff = [], [], []
+    acc, win, abs_diff, diff, marg = [], [], [], [], []
     by_pos: dict[str, list[tuple[bool, float]]] = {}
     by_cat: dict[str, list[tuple[bool, float]]] = {}
     for s, ds in zip(scores, distractors):
@@ -30,20 +44,24 @@ def cell_metrics(scores: Sequence[CandidateScores], distractors: Sequence[Sequen
         w = int((neg < gold).sum())
         acc.append(accuracy(w, len(neg), n_distractors))
         win.append(w / len(neg))
-        diff.append(float(np.abs(gold - neg).mean()))
+        abs_diff.append(float(np.abs(gold - neg).mean()))
+        diff.append(float((gold - neg).mean()))
+        marg.append(margin(gold, neg, n_distractors))
         for x, d in zip(neg, ds):
-            pair = (bool(x < gold), float(abs(gold - x)))
+            pair = (bool(x < gold), float(gold - x))
             by_pos.setdefault(str(d.positions[0]), []).append(pair)
             if len(set(d.categories)) == 1:
                 by_cat.setdefault(d.categories[0], []).append(pair)
 
     def group(pairs: list[tuple[bool, float]]) -> GroupMetrics:
         return GroupMetrics(n=len(pairs), pairwise_win=float(np.mean([w for w, _x in pairs])),
-                            abs_difference=float(np.mean([x for _w, x in pairs])))
+                            abs_difference=float(np.mean([abs(x) for _w, x in pairs])),
+                            difference=float(np.mean([x for _w, x in pairs])))
 
     return CellMetrics(
         n_blocks=len(acc), accuracy=float(np.mean(acc)), pairwise_win=float(np.mean(win)),
-        abs_difference=float(np.mean(diff)), mean_source_tokens=float(np.mean(source_tokens)),
+        abs_difference=float(np.mean(abs_diff)), difference=float(np.mean(diff)),
+        margin=float(np.mean(marg)), mean_source_tokens=float(np.mean(source_tokens)),
         by_position={k: group(v) for k, v in sorted(by_pos.items(), key=lambda x: int(x[0]))},
         by_category={k: group(v) for k, v in sorted(by_cat.items())})
 
@@ -59,7 +77,8 @@ def _mean_groups(groups: list[dict[str, GroupMetrics]]) -> dict[str, GroupMetric
         cells = [g[key] for g in groups if key in g]
         out[key] = GroupMetrics(n=sum(c.n for c in cells),
                                 pairwise_win=_mean([c.pairwise_win for c in cells]),
-                                abs_difference=_mean([c.abs_difference for c in cells]))
+                                abs_difference=_mean([c.abs_difference for c in cells]),
+                                difference=_mean([c.difference for c in cells]))
     return out
 
 
@@ -70,6 +89,8 @@ def mean_over_langs(cells: list[CellMetrics]) -> CellMetrics:
         accuracy=_mean([c.accuracy for c in cells]),
         pairwise_win=_mean([c.pairwise_win for c in cells]),
         abs_difference=_mean([c.abs_difference for c in cells]),
+        difference=_mean([c.difference for c in cells]),
+        margin=_mean([c.margin for c in cells]),
         mean_source_tokens=_mean([c.mean_source_tokens for c in cells]),
         by_position=_mean_groups([c.by_position for c in cells]),
         by_category=_mean_groups([c.by_category for c in cells]))

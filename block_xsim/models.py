@@ -128,6 +128,7 @@ class GroupMetrics(Model):
     n: int
     pairwise_win: float                             # share of pairs the reference wins
     abs_difference: float                           # mean |score(reference) - score(distractor)|
+    difference: float                               # mean score(reference) - score(distractor)
 
 
 class CellMetrics(Model):
@@ -137,6 +138,8 @@ class CellMetrics(Model):
     accuracy: float                                 # P[reference above D random distractors]
     pairwise_win: float                             # mean over blocks of w / m
     abs_difference: float                           # mean over blocks of mean |ref - distractor|
+    difference: float                               # mean over blocks of mean (ref - distractor)
+    margin: float                                   # mean over blocks of E[ref - max of D random distractors]
     mean_source_tokens: float
     by_position: dict[str, GroupMetrics]            # first perturbed sentence
     by_category: dict[str, GroupMetrics]            # distractors whose edits share one category

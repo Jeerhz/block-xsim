@@ -9,7 +9,7 @@ from conftest import FakePerturber
 from block_xsim.build_blocks import make_blocks
 from block_xsim.corpora import windows
 from block_xsim.merge_results import merge
-from block_xsim.metrics import accuracy, cell_metrics, mean_over_langs
+from block_xsim.metrics import accuracy, cell_metrics, margin, mean_over_langs
 from block_xsim.models import CandidateScores, Distractor, EvaluationConfig, EvaluationResult, ParallelCorpus
 from block_xsim.regimes import BlockGroup, distractors, fits
 
@@ -88,6 +88,14 @@ def test_accuracy_is_the_mean_over_every_subset_of_distractors():
         assert np.isclose(accuracy(w, 4, D), sum(all(s < 0.5 for s in sub) for sub in subsets) / comb(4, D))
 
 
+def test_margin_is_the_mean_over_every_subset_of_distractors():
+    scores = np.array([0.1, 0.9, 0.2, 0.5, 0.3])
+    for D in (1, 2, 3, 5):
+        subsets = list(combinations(scores, D))
+        assert np.isclose(margin(0.4, scores, D), np.mean([0.4 - max(sub) for sub in subsets]))
+    assert np.isclose(margin(0.4, scores, 1), 0.4 - scores.mean())        # D = 1: the score difference
+
+
 def test_cell_metrics_and_language_mean():
     ds = [Distractor(text="x", positions=[0], categories=["number"]),
           Distractor(text="y", positions=[1], categories=["entity"]),
@@ -96,6 +104,9 @@ def test_cell_metrics_and_language_mean():
     assert cell.n_blocks == 1 and cell.mean_source_tokens == 30
     assert cell.accuracy == pytest.approx(1 / 3) and cell.pairwise_win == pytest.approx(2 / 3)
     assert cell.abs_difference == pytest.approx((0.4 + 0.2 + 0.05) / 3)
+    assert cell.difference == pytest.approx((0.4 + 0.2 - 0.05) / 3)
+    assert cell.margin == pytest.approx(((0.9 - 0.7) + (0.9 - 0.95) + (0.9 - 0.95)) / 3)
+    assert cell.by_position["0"].difference == pytest.approx((0.4 - 0.05) / 2)
     assert cell.by_position["0"].n == 2 and cell.by_position["1"].n == 1
     assert set(cell.by_category) == {"number", "entity"} and cell.by_category["number"].pairwise_win == 1.0
     other = cell.model_copy(update={"n_blocks": 3, "accuracy": 0.0, "by_category": {}})
@@ -151,3 +162,14 @@ def test_evaluate_then_export(tmp_path, monkeypatch, block):
         assert len(row.scores["stub"].distractors) == len(row.distractors)
         assert row.source is None and row.reference is None and row.sentence_ids == ["1", "2", "3"]
         assert row.scores["stub"].reference == 0 and all(s < 0 for s in row.scores["stub"].distractors)
+
+    # recompute_cells rebuilds the same cells from the stored scores, also from split files
+    from block_xsim.recompute_cells import recompute
+    halves = []
+    for i, part in enumerate((REGIMES[:2], REGIMES[2:])):
+        halves.append(tmp_path / f"part{i}.json")
+        EvaluationResult(timestamp="t", config=config, scorers={"stub": ScorerCells(
+            rule="cosine", regimes={r: regimes[r] for r in part})}).save(halves[-1])
+    recompute(halves, tmp_path / "joined.json")
+    joined = EvaluationResult.load(tmp_path / "joined.json")
+    assert joined.model_dump(exclude={"timestamp"}) == result.model_dump(exclude={"timestamp"})
